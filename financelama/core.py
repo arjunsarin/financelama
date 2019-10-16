@@ -38,12 +38,17 @@ class lama:
             df['account'] = first_line.columns[1]
             
             # Rename columns to standard definition
-            df = df.rename(columns={'Wertstellung': 'day',
-                                    'Buchungstext': 'info',
-                                    'Beschreibung': 'orderer',
-                                    'Betrag (EUR)': 'value'})
+            df = df.rename(columns={
+                'Wertstellung': 'day',
+                'Buchungstext': 'info',
+                'Beschreibung': 'orderer',
+                'Betrag (EUR)': 'value'})
+
             # Drop irrelevant columns
-            df = df.drop(columns=['Umsatz abgerechnet und nicht im Saldo enthalten'])
+            df = df.drop(columns=[
+                'Umsatz abgerechnet und nicht im Saldo enthalten',
+                'Belegdatum',
+                'Unnamed: 6'])
             if 'Ursprünglicher Betrag' in df.columns:
                 df = df.drop(columns=['Ursprünglicher Betrag'])
             
@@ -52,9 +57,16 @@ class lama:
         
         self.data = pd.concat([self.data, df], sort='True', ignore_index='True')
 
+    def cleanup(self):
+        self.data = self.data.drop_duplicates()
+
+
 if __name__ == "__main__":
     obj = lama()
     obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540.csv')
+    obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540.csv')
     obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/4998________2043.csv')
-    
-    print(obj.data)
+
+    obj.cleanup()
+
+    obj.data.to_csv(path_or_buf="test.csv")
