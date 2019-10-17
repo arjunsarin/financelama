@@ -19,11 +19,21 @@ def generate_table(dataframe):
 
 def generate_time_aggregated_expenses(dataframe):
     data = [go.Scatter(
-                x=dataframe.day,
-                y=dataframe.value,
-                name='Rest of world',
-                mode='markers'
-        )]
+                x = dataframe.day,
+                y = dataframe.value,
+                name = 'Rest of world',
+                mode = 'markers',
+                # TODO Add aggregation
+                # transforms = [dict(
+                #     type = 'aggregate',
+                #     aggregations = [dict(
+                #         target='y',
+                #         func='sum',
+                #         enabled=True
+                #     )]
+
+                # )]
+    )]
 
     layout = go.Layout(
                 title='Time-aggregated expenses'
