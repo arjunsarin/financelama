@@ -11,10 +11,15 @@ class lama:
 
     def readFile(self, path):
         # Read bank account from first line to determine file type (giro or debit card)
-        first_line = pd.read_csv(path, delimiter=';', encoding='mbcs', nrows=0)
+        first_line = pd.read_csv(
+            path, delimiter=';', encoding='mbcs', nrows=0, 
+        )
         
         # Read CSV file, skip Header with time and account data, MBS encoding (windows only) for special characters
-        df = pd.read_csv(path, delimiter=';', encoding='mbcs', skiprows=6)
+        df = pd.read_csv(
+            path, delimiter=';', encoding='mbcs', skiprows=6,
+        )
+        
         if first_line.columns[0] == 'Kontonummer:':         ### GIRO      
             # Add columm with bank account
             df['account'] = first_line.columns[1].split(' / ')[0]
@@ -57,7 +62,12 @@ class lama:
         # Cast colums to nice data datatypes
         df['day'] = pd.to_datetime(df['day'], format='%d.%m.%Y')
         
+        # Change decimal and thousand separator in value column
+        df['value'] = df['value'].apply(lambda x: x.replace('.',''), )
+        df['value'] = df['value'].apply(lambda x: x.replace(',','.'), )
+
         self.data = pd.concat([self.data, df], sort='True', ignore_index='True')
+        self.cleanup()
 
     def readFolder(self, path):
         # Get file list of folder
@@ -65,19 +75,28 @@ class lama:
                     if isfile(join(path, f)) and f.endswith('.csv')]
 
         for f in files:
-            self.readFile(join(path, f))
+            try:
+                self.readFile(join(path, f))
+            except:
+                print('Error while reading file: ' + f)
 
     def cleanup(self):
         self.data = self.data.drop_duplicates()
+        #TODO Add duplicate removal when only minor changes are detected (manual changes in DB)
 
 
-if __name__ == "__main__":
+def main():
     obj = lama()
     #obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540.csv')
-    #obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540.csv')
+    #obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540(3).csv')   # Lots of data here
     #obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/4998________2043.csv')
     obj.readFolder('E:/Dokumente/Finanzen/Analyse/financelama-git/data/')
 
     obj.cleanup()
 
-    obj.data.to_csv(path_or_buf="test.csv")
+    obj.data.to_csv(path_or_buf='E:/Dokumente/Finanzen/Analyse/financelama-git/financelama/OutputDB.csv')
+
+    return obj
+
+if __name__ == "__main__":
+    main()
