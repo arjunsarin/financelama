@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import pandas as pd
+from os import listdir
+from os.path import isfile, join
 
 class lama:
     data = pd.DataFrame(columns=[
@@ -57,15 +59,24 @@ class lama:
         
         self.data = pd.concat([self.data, df], sort='True', ignore_index='True')
 
+    def readFolder(self, path):
+        # Get file list of folder
+        files = [f for f in listdir(path)
+                    if isfile(join(path, f)) and f.endswith('.csv')]
+
+        for f in files:
+            self.readFile(join(path, f))
+
     def cleanup(self):
         self.data = self.data.drop_duplicates()
 
 
 if __name__ == "__main__":
     obj = lama()
-    obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540.csv')
-    obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540.csv')
-    obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/4998________2043.csv')
+    #obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540.csv')
+    #obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540.csv')
+    #obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/4998________2043.csv')
+    obj.readFolder('E:/Dokumente/Finanzen/Analyse/financelama-git/data/')
 
     obj.cleanup()
 
