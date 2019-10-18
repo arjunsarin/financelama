@@ -4,7 +4,10 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 
+import pandas as pd
+
 import core
+
 
 def generate_table(dataframe):
     return html.Table(
@@ -17,30 +20,27 @@ def generate_table(dataframe):
         ]) for i in range(len(dataframe))]
     )
 
-def generate_time_aggregated_expenses(dataframe):
-    data = [go.Scatter(
-                x = dataframe.day,
-                y = dataframe.value,
-                name = 'Rest of world',
-                mode = 'markers',
-                # TODO Add aggregation
-                # transforms = [dict(
-                #     type = 'aggregate',
-                #     aggregations = [dict(
-                #         target='y',
-                #         func='sum',
-                #         enabled=True
-                #     )]
 
-                # )]
+def generate_time_aggregated_expenses(dataframe):
+    # Extract relevant columns and neglect day for monthly 
+    extract = dataframe[['day', 'value']]
+
+    # Sum up values per week, returns object with DatetimeIndex
+    extract = extract.groupby(pd.Grouper(key='day', freq='M')).sum()
+
+    data = [dict(
+        type='bar',
+        x=extract.index,
+        y=extract.value,
+        name='Rest of world',
     )]
 
     layout = go.Layout(
-                title='Time-aggregated expenses'
-            )
-    
-    
-    return dcc.Graph(figure = go.Figure(data, layout))
+        title='Time-aggregated expenses'
+    )
+
+    return dcc.Graph(figure=go.Figure(data, layout))
+
 
 def main():
     # Get data from core module
@@ -51,11 +51,12 @@ def main():
     app.layout = html.Div(children=[
         html.H1(children='Financelama'),
 
-        #generate_table(lama.data)
+        # generate_table(lama.data)
         generate_time_aggregated_expenses(lama.data)
     ])
 
     app.run_server(debug=True)
+
 
 if __name__ == '__main__':
     main()
