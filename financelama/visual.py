@@ -6,9 +6,6 @@ import plotly.graph_objs as go
 
 import pandas as pd
 
-import financelama.read_dkb as dkb
-
-
 # TODO Activity heatmap (github-like) see: https://community.plot.ly/t/colored-calendar-heatmap-in-dash/10907/5
 
 def generate_table(dataframe):
@@ -43,21 +40,14 @@ def generate_monthly_expenses(dataframe):
     return dcc.Graph(figure=go.Figure(data, layout))
 
 
-def main():
-    # Get data from core module
-    lama = dkb.main()
-
+def start_dashboard(dataframe: pd.DataFrame):
     app = dash.Dash(__name__, external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css'])
 
     app.layout = html.Div(children=[
         html.H1(children='Financelama'),
 
         # generate_table(lama.data)
-        generate_monthly_expenses(lama.data)
+        generate_monthly_expenses(dataframe)
     ])
 
     app.run_server(debug=True)
-
-
-if __name__ == '__main__':
-    main()
