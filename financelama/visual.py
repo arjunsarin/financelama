@@ -6,7 +6,8 @@ import plotly.graph_objs as go
 
 import pandas as pd
 
-# TODO Activity heatmap (github-like) see: https://community.plot.ly/t/colored-calendar-heatmap-in-dash/10907/5
+
+#ROADMAP Activity heatmap (github-like) see: https://community.plot.ly/t/colored-calendar-heatmap-in-dash/10907/5
 
 def generate_table(dataframe):
     return html.Table(
