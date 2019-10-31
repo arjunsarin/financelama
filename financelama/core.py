@@ -3,8 +3,8 @@ from typing import List
 
 import pandas as pd
 
-import financelama.lut_categories
-
+from financelama.config.lut_categories import categories as config_categories
+from financelama.config.drop_transactions import attributes as config_drop_attributes
 
 class Lama:
     data = pd.DataFrame(columns=[
@@ -12,7 +12,7 @@ class Lama:
         'reason', 'value', 'category'])
 
     def _get_category(self, identifier: str):
-        for category, keywords in financelama.lut_categories.categories.items():
+        for category, keywords in config_categories.items():
             # Check for each keyword
             for k in keywords:
                 # Check if lower-case keyword is substring of lower-case identifier
@@ -35,4 +35,21 @@ class Lama:
 
     def cleanup(self):
         self.data = self.data.drop_duplicates()
-        # TODO Add duplicate removal when only minor changes are detected (manual changes in DB)
+
+        # Drop transactions with configured attributes
+        balance = 0
+        counter = 0
+        for index, row in self.data.sort_values(by=['day']).iterrows():
+            for col, tags in config_drop_attributes.items():
+                for t in tags:
+                    if row[col].lower().find(t.lower()) != -1:
+                        # Print info message
+                        msg = row['orderer'] + '|' + row['info'] + '|' + str(row['value'])
+                        print("[Drop Transactions]" + msg)
+
+                        # Drop row
+                        balance += row['value']
+                        counter += 1
+                        self.data.drop(index, inplace=True)
+        print('[REPORT>Drop Transactions] Total count: ' + str(counter) + ' with balance of ' + str(round(balance)) + ' EUR.')
+        #ROADMAP Smart matching of debit balances and give warning when found unmatching transaction

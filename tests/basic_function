@@ -9,7 +9,7 @@ obj = Lama()
 #obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540(3).csv')   # Lots of data here
 obj.data = dkb.read_folder(obj.data, 'E:/Dokumente/Finanzen/Analyse/financelama-git/data/')
 obj.cleanup()
-obj.categorize()
+#obj.categorize()
 
 obj.data.to_csv(path_or_buf='E:/Dokumente/Finanzen/Analyse/financelama-git/financelama/OutputDB.csv')
 
