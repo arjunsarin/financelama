@@ -3,7 +3,7 @@ from typing import List
 
 import pandas as pd
 
-from financelama.config.lut_categories import categories as config_categories
+import financelama.categories as categories
 from financelama.config.drop_transactions import attributes as config_drop_attributes
 
 class Lama:
@@ -11,20 +11,10 @@ class Lama:
         'day', 'info', 'orderer', 'orderer_account', 'orderer_bank',
         'reason', 'value', 'category'])
 
-    def _get_category(self, identifier: str):
-        for category, keywords in config_categories.items():
-            # Check for each keyword
-            for k in keywords:
-                # Check if lower-case keyword is substring of lower-case identifier
-                if identifier.lower().find(k.lower()) != -1:
-                    return category
-        # Default value if no category was found
-        return 'other'
-
     def categorize(self):
         for index, row in self.data.iterrows():
             concat = row['orderer'] + row['reason']
-            assigned_category = self._get_category(concat)
+            assigned_category = categories.get_category(concat)
             self.data.set_value(index, 'category', assigned_category)
             #TODO set_value is deprecated and will be removed in a future release. Please use .at[] or .iat[] accessors instead
 
@@ -51,5 +41,5 @@ class Lama:
                         balance += row['value']
                         counter += 1
                         self.data.drop(index, inplace=True)
-        print('[REPORT>Drop Transactions] Total count: ' + str(counter) + ' with balance of ' + str(round(balance)) + ' EUR.')
+        print('[REPORT > Drop Transactions] Total count: ' + str(counter) + ' with balance of ' + str(round(balance)) + ' EUR.')
         #ROADMAP Smart matching of debit balances and give warning when found unmatching transaction
