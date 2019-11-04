@@ -4,18 +4,21 @@ import financelama.visual as visual
 import timeit
 import os
 
+def benchmark(function):
+    print(timeit.timeit(obj.categorize, number=1))
+
+
 # Create lama object with dataframe as data property
 obj = Lama()
 
 # Read files
-obj.read_file('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540(3).csv')   # Lots of data here
-#obj.read_folder('E:/Dokumente/Finanzen/Analyse/financelama-git/data/')
+#obj.read_file('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540(3).csv')   # Lots of data here
+benchmark(obj.read_folder('E:/Dokumente/Finanzen/Analyse/financelama-git/data/'))
 
 #obj.cleanup()
-obj.categorize()
-#print(timeit.timeit(obj.categorize()))
+benchmark(obj.categorize)
 
 # Start DASH web application
-#visual.start_dashboard(obj.data)
+visual.start_dashboard(obj.connect_database()[0])
 
-#os.remove('lama.db')
+os.remove('lama.db')

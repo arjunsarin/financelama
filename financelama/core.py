@@ -27,11 +27,16 @@ class Lama:
             table.to_sql('transactions', con, index=False)
             con.close()
 
-    def connect_database(self, sql_query):
+    def connect_database(self, sql_query=None):
+        if sql_query==None:
+            sql_query='SELECT * FROM transactions'
+
         con = sqlite3.connect(self.PATH_DB)
         df = pd.read_sql(sql_query, con)
 
         # Cast columns to correct datatypes
+        if 'day' in df.columns:
+            df = df.astype({'day': 'datetime64'})
         if 'value' in df.columns:
             df = df.astype({'value': 'float64'})
         if 'orderer' in df.columns:
@@ -151,7 +156,7 @@ class Lama:
         csv_file['value'] = csv_file['value'].apply(lambda x: x.replace(',', '.'), )
 
         # Parsing day to standard timestamp YYYY-MM-DD
-        csv_file['day'] = pd.to_datetime(csv_file['day'], format='%d.%m.%Y').astype({'day': 'str'})
+        csv_file['day'] = pd.to_datetime(csv_file['day'], format='%d.%m.%Y')
         csv_file['value'] = pd.to_numeric(csv_file['value'])
 
         # Missing values are represented by '' which has to be filled by nan so
