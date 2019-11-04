@@ -1,17 +1,21 @@
 from financelama.core import Lama as Lama
-import financelama.read_dkb as dkb
 import financelama.visual as visual
+
+import timeit
+import os
 
 # Create lama object with dataframe as data property
 obj = Lama()
 
 # Read files
-#obj.readFile('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540(3).csv')   # Lots of data here
-obj.data = dkb.read_folder(obj.data, 'E:/Dokumente/Finanzen/Analyse/financelama-git/data/')
-obj.cleanup()
-#obj.categorize()
+obj.read_file('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540(3).csv')   # Lots of data here
+#obj.read_folder('E:/Dokumente/Finanzen/Analyse/financelama-git/data/')
 
-obj.data.to_csv(path_or_buf='E:/Dokumente/Finanzen/Analyse/financelama-git/financelama/OutputDB.csv')
+#obj.cleanup()
+obj.categorize()
+#print(timeit.timeit(obj.categorize()))
 
 # Start DASH web application
 #visual.start_dashboard(obj.data)
+
+#os.remove('lama.db')
