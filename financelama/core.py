@@ -128,7 +128,7 @@ class Lama:
             # Add columm with bank account
             csv_file['account'] = first_line.columns[1]
 
-            # Fill not existing columns with empty string
+            # Create not existing columns and fill with empty string
             csv_file['info'] = ''
             csv_file['reason'] = ''
 
@@ -154,14 +154,15 @@ class Lama:
         csv_file['day'] = pd.to_datetime(csv_file['day'], format='%d.%m.%Y').astype({'day': 'str'})
         csv_file['value'] = pd.to_numeric(csv_file['value'])
 
+        # Missing values are represented by '' which has to be filled by nan so
+        # that the merge operation is able to filter out duplicates correctly
+        csv_file = csv_file.fillna(value='None')
+
         # Merge new file into existing database
-        sql_query = 'SELECT * FROM transactions'
+        sql_query = 'SELECT day, info, orderer, reason, orderer_account, orderer_bank, value, account FROM transactions'
         initial_df, conn = self.connect_database(sql_query)
 
-        print('CSV FILE')
-        print(csv_file.dtypes)
-        print('INITIAL DF')
-        print(initial_df.dtypes)
+        #TODO duplicates are not recognized as missing value is in csv file empty ('') and in database NULL or in python None
 
         # Drop rows which are already in the database (avoiding duplicates)
         df_merge = pd.merge(initial_df, csv_file, how='outer', indicator=True)
