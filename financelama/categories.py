@@ -13,8 +13,8 @@ categories = {
 }
 
 
-def get_category(self, identifier: str):
-    for category, keywords in config_categories.items():
+def get_category(identifier: str):
+    for category, keywords in categories.items():
         # Check for each keyword
         for k in keywords:
             # Check if lower-case keyword is substring of lower-case identifier
