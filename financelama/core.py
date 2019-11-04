@@ -158,11 +158,6 @@ class Lama:
         sql_query = 'SELECT * FROM transactions'
         initial_df, conn = self.connect_database(sql_query)
 
-        print('CSV FILE')
-        print(csv_file.dtypes)
-        print('INITIAL DF')
-        print(initial_df.dtypes)
-
         # Drop rows which are already in the database (avoiding duplicates)
         df_merge = pd.merge(initial_df, csv_file, how='outer', indicator=True)
         new_data = df_merge.query('_merge == "right_only"').drop(['_merge'], 1)
