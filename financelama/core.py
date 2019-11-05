@@ -11,7 +11,7 @@ import financelama.categories as categories
 from financelama.config.drop_transactions import attributes as config_drop_attributes
 
 
-class Lama:
+class Financelama:
     PATH_DB: str
 
     def __init__(self, path_database='lama.db'):
@@ -21,7 +21,7 @@ class Lama:
         if not os.path.isfile(self.PATH_DB):
             table = pd.DataFrame(columns=[
                 'account', 'day', 'info', 'orderer', 'orderer_account', 'orderer_bank',
-                'reason', 'value', 'category'])
+                'reason', 'value', 'category', 'report'])
 
             con = sqlite3.connect(self.PATH_DB)
             table.to_sql('transactions', con, index=False)
@@ -61,7 +61,7 @@ class Lama:
         for index, row in df.iterrows():
             concat = row['orderer'] + row['reason']
             assigned_category = categories.get_category(concat)
-            cur.execute('UPDATE transactions SET category = ? WHERE rowid = ?', [assigned_category, row['rowid']])
+            cur.execute('UPDATE transactions SET category = ? WHERE _ROWID_ = ?', [assigned_category, row['rowid']])
 
             # Print info message
             info_str = row['orderer'] + '|' + row['info'] + '|' + row['reason']
@@ -192,3 +192,23 @@ class Lama:
             # except:
             #    print('Error while reading file: ' + f + ' in ' + path)
             #    print(sys.exc_info()[0])
+
+    def modify_report(self, report_name, list_of_rowids=None, list_of_ranges=None):
+        conn = self.connect_database()[1]
+        cur = conn.cursor()
+
+        counter = 0
+        if list_of_rowids != None:
+            for i in list_of_rowids:
+                cur.execute('UPDATE transactions SET report =  ? WHERE _ROWID_ = ?', [report_name, i])
+                counter += 1
+
+        if list_of_ranges != None:
+            for i in list_of_ranges:
+                row_ids = list(range(i[0], i[1]+1))
+                arg = list(zip([report_name] * len(row_ids), row_ids))
+                cur.executemany('UPDATE transactions SET report =  ? WHERE _ROWID_ = ?', arg)
+                counter += len(row_ids)
+
+        conn.commit()
+        conn.close()
