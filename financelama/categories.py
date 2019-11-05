@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# If one of the keywords is found within the orderer or info column this column is associated with that transaction
-
 categories = {
     'supermarket': ['rewe', 'coop', 'edeka', 'lidl', 'netto', 'norma', 'frukt', 'ica'],
     'rent': ['miete', 'miete', 'wohnung', 'etagenbeitrag'],

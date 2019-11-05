@@ -22,6 +22,8 @@ benchmark(lama.categorize)
 lama.modify_report('urlaub', list_of_rowids={1, 2, 3})
 lama.modify_report('urlaub', list_of_ranges={(617, 620)})
 
+lama.evaluate()
+
 # Start DASH web application
 #visual.start_dashboard(lama.connect_database()[0])
 

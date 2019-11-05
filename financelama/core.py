@@ -51,7 +51,7 @@ class Financelama:
             table.to_sql('transactions', con, index=False)
             con.close()
 
-    def connect_database(self, sql_query: str=None):
+    def connect_database(self, sql_query: str = None):
         """ Connect to database and casts columns to correct datatypes.
 
         Parameters
@@ -65,8 +65,8 @@ class Financelama:
         Both, a pandas.Dataframe and the database connection are returned as
         touple in that very order.
         """
-        if sql_query==None:
-            sql_query='SELECT * FROM transactions'
+        if sql_query is None:
+            sql_query = 'SELECT * FROM transactions'
 
         con = sqlite3.connect(self.PATH_DB)
         df = pd.read_sql(sql_query, con)
@@ -82,6 +82,10 @@ class Financelama:
             df = df.astype({'info': 'str'})
         if 'reason' in df.columns:
             df = df.astype({'reason': 'str'})
+        if 'category' in df.columns:
+            df = df.astype({'category': 'str'})
+        if 'report' in df.columns:
+            df = df.astype({'report': 'str'})
 
         return df, con
 
@@ -107,11 +111,13 @@ class Financelama:
         for index, row in df.iterrows():
             concat = row['orderer'] + row['reason']
             assigned_category = categories.get_category(concat)
-            cur.execute('UPDATE transactions SET category = ? WHERE _ROWID_ = ?', [assigned_category, row['rowid']])
+            cur.execute('UPDATE transactions SET category = ? WHERE _ROWID_ = ?',
+                        [assigned_category, row['rowid']])
 
             # Print info message
             info_str = row['orderer'] + '|' + row['info'] + '|' + row['reason']
-            print('[Categorize] TRANSACTION ' + info_str.ljust(80)[:80] + ' ASSIGNED TO ' + assigned_category)
+            print('[Categorize] TRANSACTION ' + info_str.ljust(80)[
+                                                :80] + ' ASSIGNED TO ' + assigned_category)
 
         conn.commit()
         conn.close()
@@ -120,11 +126,11 @@ class Financelama:
         print('Sorry, this function needs modification in order to comply with SQLite table.')
         return
 
-        #ROADMAP check for duplicates
-        #self.data = self.data.drop_duplicates()
+        # ROADMAP check for duplicates
+        # self.data = self.data.drop_duplicates()
 
-        #ROADMAP Drop transactions with configured attributes
-        #ROADMAP Smart matching of debit balances and give warning when found unmatching transaction
+        # ROADMAP Drop transactions with configured attributes
+        # ROADMAP Smart matching of debit balances and give warning when found unmatching transaction
         # balance = 0
         # counter = 0
         # for index, row in self.data.sort_values(by=['day']).iterrows():
@@ -141,6 +147,50 @@ class Financelama:
         #                 self.data.drop(index, inplace=True)
         # print('[REPORT > Drop Transactions] Total count: ' + str(counter) + ' with balance of ' + str(
         #     round(balance)) + ' EUR.')
+
+    def evaluate(self):
+        """
+        Evaluates database in preparation of analysis.
+
+        Replaces all reported transactions with single aggregated new row.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Evaluated data ready to be processed of analysis module (e.g. visual)
+        """
+        # Get total data frame
+        df, conn = self.connect_database(
+            'SELECT * FROM transactions')
+        cur = conn.cursor()
+
+        # Evaluate reports
+        cur.execute('SELECT DISTINCT report FROM transactions')
+        report_names = cur.fetchall()
+
+        for name in report_names:
+            if name[0] is None:
+                continue
+
+            # Aggregate data from database
+            cur.execute('SELECT SUM(value) FROM transactions WHERE report=?', name)
+            sum = cur.fetchone()[0]
+            cur.execute('SELECT MIN(day) FROM transactions WHERE report=?', name)
+            date = cur.fetchone()[0]
+
+            # Add row with aggregated exense
+            df.append({'day': date,
+                       'reason': name[0],
+                       'value': sum,
+                       'info': 'REPORTED'},
+                      ignore_index=True)
+
+        # Remove all reported transaction from dataframe
+        df = df[df.report == 'None']
+
+        conn.close()
+
+        return df
 
     def read_file(self, path: str):
         """
@@ -161,7 +211,8 @@ class Financelama:
             path, delimiter=';', encoding='mbcs', nrows=0,
         )
 
-        # Read CSV file, skip Header with time and account data, MBS encoding (windows only) for special characters
+        # Read CSV file, skip Header with time and account data, MBS encoding (windows only) for
+        # special characters
         csv_file = pd.read_csv(
             path, delimiter=';', encoding='mbcs', skiprows=6,
         )
@@ -226,7 +277,8 @@ class Financelama:
         sql_query = 'SELECT day, info, orderer, reason, orderer_account, orderer_bank, value, account FROM transactions'
         initial_df, conn = self.connect_database(sql_query)
 
-        #TODO duplicates are not recognized as missing value is in csv file empty ('') and in database NULL or in python None
+        # TODO duplicates are not recognized as missing value is in csv file empty ('') and in
+        #  database NULL or in python None
 
         # Drop rows which are already in the database (avoiding duplicates)
         df_merge = pd.merge(initial_df, csv_file, how='outer', indicator=True)
@@ -258,7 +310,7 @@ class Financelama:
 
         for f in files:
             # try:
-            df = self.read_file(join(path, f))
+            self.read_file(join(path, f))
             # except:
             #    print('Error while reading file: ' + f + ' in ' + path)
             #    print(sys.exc_info()[0])
@@ -286,14 +338,15 @@ class Financelama:
         cur = conn.cursor()
 
         counter = 0
-        if list_of_rowids != None:
+        if list_of_rowids is not None:
             for i in list_of_rowids:
-                cur.execute('UPDATE transactions SET report =  ? WHERE _ROWID_ = ?', [report_name, i])
+                cur.execute('UPDATE transactions SET report =  ? WHERE _ROWID_ = ?',
+                            [report_name, i])
                 counter += 1
 
-        if list_of_ranges != None:
+        if list_of_ranges is not None:
             for i in list_of_ranges:
-                row_ids = list(range(i[0], i[1]+1))
+                row_ids = list(range(i[0], i[1] + 1))
                 arg = list(zip([report_name] * len(row_ids), row_ids))
                 cur.executemany('UPDATE transactions SET report =  ? WHERE _ROWID_ = ?', arg)
                 counter += len(row_ids)
