@@ -22,6 +22,19 @@ def generate_table(dataframe):
 
 
 def generate_monthly_expenses(dataframe):
+    """
+    Generates aggregated monthly expenses as bar chart.
+
+    Parameters
+    ----------
+    dataframe : pandas.DataFrame
+        Evaluated dataframe with data to display
+
+    Returns
+    -------
+    dash_core_components.Graph
+        Graph to add to dash layout.
+    """
     extract = dataframe[['day', 'value']]
 
     # Sum up values per week, returns object with DatetimeIndex
@@ -42,6 +55,15 @@ def generate_monthly_expenses(dataframe):
 
 
 def start_dashboard(dataframe: pd.DataFrame):
+    """
+    Creates dashboard as web page and starts local server. Functions generating
+    page content are invoked from here.
+
+    Parameters
+    ----------
+    dataframe : pandas.DataFrame
+        Evaluated dataframe with data to display
+    """
     app = dash.Dash(__name__, external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css'])
 
     app.layout = html.Div(children=[

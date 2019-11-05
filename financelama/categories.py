@@ -13,7 +13,20 @@ categories = {
 }
 
 
-def get_category(identifier: str):
+def get_category(identifier: str) -> str:
+    """
+    Finds suitable category for given identifier from look up table. If no
+    matching category is found, 'other' as fallback will be returned.
+
+    Parameters
+    ----------
+    identifier : str
+        String which is used for finding category
+
+    Returns
+    -------
+    category : str
+    """
     for category, keywords in categories.items():
         # Check for each keyword
         for k in keywords:

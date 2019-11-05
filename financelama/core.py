@@ -12,9 +12,33 @@ from financelama.config.drop_transactions import attributes as config_drop_attri
 
 
 class Financelama:
+    """
+    Manages database and provides data processing functionality.
+
+    Methods
+    -------
+    connect_database(sql_query=None)
+        Connect to database and casts columns to correct datatypes.
+    categorize(all_entries=False)
+        Add categories to rows in database
+    cleanup()
+    read_file(path)
+        Load CSV file into database
+    read_folder(path)
+        Load CSV file from folder into database
+    modify_report(report_name: str, list_of_rowids=None, list_of_ranges=None)
+        Modify report column in database for specified rows
+    """
     PATH_DB: str
 
     def __init__(self, path_database='lama.db'):
+        """ Check if database file already exists and create with all columns if not.
+
+        Parameters
+        ----------
+        path_database : str, optional
+            Path to SQLite database (either existing or not). Default: 'lama.db'
+        """
         self.PATH_DB = path_database
 
         # Create database file if not already existing
@@ -27,7 +51,20 @@ class Financelama:
             table.to_sql('transactions', con, index=False)
             con.close()
 
-    def connect_database(self, sql_query=None):
+    def connect_database(self, sql_query: str=None):
+        """ Connect to database and casts columns to correct datatypes.
+
+        Parameters
+        ----------
+        sql_query : str, optional
+            Optional SQL query to run against database. If not given, all
+            columns from table transactions are retrieved.
+
+        Returns
+        -------
+        Both, a pandas.Dataframe and the database connection are returned as
+        touple in that very order.
+        """
         if sql_query==None:
             sql_query='SELECT * FROM transactions'
 
@@ -49,6 +86,15 @@ class Financelama:
         return df, con
 
     def categorize(self, all_entries=False):
+        """
+        Add categories to rows in database
+
+        Parameters
+        ----------
+        all_entries : bool, optional
+            Assigns categories to ALL rows neglecting existing assignments
+        """
+
         # Load database from file
         if all_entries:
             sql_query = 'SELECT rowid, info, orderer, reason FROM transactions'
@@ -96,7 +142,20 @@ class Financelama:
         # print('[REPORT > Drop Transactions] Total count: ' + str(counter) + ' with balance of ' + str(
         #     round(balance)) + ' EUR.')
 
-    def read_file(self, path):
+    def read_file(self, path: str):
+        """
+        Load CSV file into database
+
+        The file can be either a debit card or giro export from DKB.
+        Data is added to the database which is associated with that class instance.
+        Potential duplicates are filtered before adding data to database.
+
+        Parameters
+        ----------
+        path : str
+            CSV file to load
+        """
+
         # Read bank account from first line to determine file type (giro or debit card)
         first_line = pd.read_csv(
             path, delimiter=';', encoding='mbcs', nrows=0,
@@ -182,6 +241,17 @@ class Financelama:
         print(msg.format(new_data.shape[0], path, csv_file.shape[0]))
 
     def read_folder(self, path):
+        """
+        Load CSV file from folder into database
+
+        Convenience function to load several files into database. read_file() is
+        invoked for each file.
+
+        Parameters
+        ----------
+        path : str
+             Folder containing several compatible CSV files
+        """
         # Get file list of folder
         files = [f for f in listdir(path)
                  if isfile(join(path, f)) and f.endswith('.csv')]
@@ -193,7 +263,25 @@ class Financelama:
             #    print('Error while reading file: ' + f + ' in ' + path)
             #    print(sys.exc_info()[0])
 
-    def modify_report(self, report_name, list_of_rowids=None, list_of_ranges=None):
+    def modify_report(self, report_name: str, list_of_rowids=None, list_of_ranges=None):
+        """
+        Modify report column in database for specified rows
+
+        Updates report column in database for all rows specified by rowid. All
+        transactions within the same report are handled as a single expense,
+        for example holiday expenses can be summarized into one report.
+        Note: The user has to make sure that new report name isn't used already.
+
+        Parameters
+        ----------
+        report_name : str
+            Name of report
+        list_of_rowids : list of ints, optional
+            RowIds to update
+        list_of_ranges : list of int touples, optional
+            Range of rowids will be updated with report_name. Both values are included.
+
+        """
         conn = self.connect_database()[1]
         cur = conn.cursor()
 
