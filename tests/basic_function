@@ -4,25 +4,30 @@ import financelama.visual as visual
 import timeit
 import os
 
+from financelama.file_import import read_file_dkb, read_folder_dkb
+from financelama.process import categorize, modify_report
+from financelama.report import evaluate
+
 
 def benchmark(function):
-    print(timeit.timeit(lama.categorize, number=1))
+    print(timeit.timeit(function, number=1))
 
 
 # Create lama object with dataframe as data property
 lama = Financelama()
 
 # Read files
-# obj.read_file('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540(3).csv')   # Lots of data here
-benchmark(lama.read_folder('E:/Dokumente/Finanzen/Analyse/financelama-git/data/'))
+# obj.read_file('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540(3).csv')
+# Lots of data here
+read_folder_dkb(lama, 'E:/Dokumente/Finanzen/Analyse/financelama-git/data/')
 
 # obj.cleanup()
-benchmark(lama.categorize)
+categorize(lama)
 
-lama.modify_report('urlaub', list_of_rowids={1, 2, 3})
-lama.modify_report('urlaub', list_of_ranges={(617, 620)})
+modify_report(lama, 'urlaub', list_of_rowids={1, 2, 3})
+modify_report(lama, 'urlaub', list_of_ranges={(617, 620)})
 
-lama.evaluate()
+#evaluate()
 
 # Start DASH web application
 #visual.start_dashboard(lama.connect_database()[0])
