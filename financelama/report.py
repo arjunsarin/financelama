@@ -2,7 +2,7 @@ from financelama.core import Financelama
 import pandas as pd
 
 
-def _eval_report(df: pd.Dataframe, conn):
+def _eval_report(df: pd.DataFrame, conn):
     """
     Replaces all reported transactions with single aggregated new row.
 

@@ -13,6 +13,8 @@ categories = {
 
 def _get_category(identifier: str) -> str:
     """
+    Get suitable category for identifier.
+
     Finds suitable category for given identifier from look up table. If no
     matching category is found, 'other' as fallback will be returned.
 
@@ -69,38 +71,6 @@ def categorize(lama: Financelama, all_entries=False):
 
     conn.commit()
     conn.close()
-
-
-def cleanup():
-    print('Sorry, this function needs modification in order to comply with SQLite table.')
-    return
-
-    # ROADMAP check for duplicates
-    # self.data = self.data.drop_duplicates()
-
-    # Transactions will be dropped if the following string is found as substring within the according column
-    #attributes = {
-    #    'orderer': ['KREDITKARTENABRECHNUNG', 'Ausgleich Kreditkarte'],
-    #}
-
-    # ROADMAP Drop transactions with configured attributes
-    # ROADMAP Smart matching of debit balances and give warning when found unmatching transaction
-    # balance = 0
-    # counter = 0
-    # for index, row in self.data.sort_values(by=['day']).iterrows():
-    #     for col, tags in config_drop_attributes.items():
-    #         for t in tags:
-    #             if row[col].lower().find(t.lower()) != -1:
-    #                 # Print info message
-    #                 msg = row['orderer'] + '|' + row['info'] + '|' + str(row['value'])
-    #                 print("[Drop Transactions]" + msg)
-    #
-    #                 # Drop row
-    #                 balance += row['value']
-    #                 counter += 1
-    #                 self.data.drop(index, inplace=True)
-    # print('[REPORT > Drop Transactions] Total count: ' + str(counter) + ' with balance of ' + str(
-    #     round(balance)) + ' EUR.')
 
 
 def modify_report(lama: Financelama, report_name: str,

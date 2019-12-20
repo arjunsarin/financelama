@@ -2,23 +2,28 @@ import pandas as pd
 import os.path
 
 from financelama.core import Financelama
+from financelama.config import *
 
-# Specification how file columns are mapped to Financelama columns (concatenates more than 1 col)
-# Make empty entries for empty mapping
-financelama_columns = [
-    'day', 'info', 'orderer', 'reason', 'orderer_account', 'orderer_bank', 'value'
-]
-mapping_dkb_giro = [
-    ['Wertstellung'], ['Buchungstext'], ['Auftraggeber / Begünstigter'], ['Verwendungszweck'],
-    ['Kontonummer'], ['BLZ'], ['Betrag (EUR)']
-]
-mapping_dkb_debit = [
-    ['Wertstellung'], [], ['Beschreibung'], [], [], [], ['Betrag (EUR)']
-]
 
-mapping_paypal = [
-    ['Datum'], ['Hinweis'], ['Name'], ['Typ', 'Betreff'], [], [], ['Netto']
-]
+def _drop_irrelevant_records(df: pd.DataFrame) -> pd.DataFrame:
+    balance = 0
+    counter = 0
+    for index, row in df.sort_values(by=['day']).iterrows():
+        for col, tags in dropping_keywords.items():
+            for t in tags:
+                if row[col].lower().find(t.lower()) != -1:
+                    # Print info message
+                    msg = row['orderer'] + '|' + row['info'] + '|' + str(row['value'])
+                    print("[Drop Transactions]" + msg)
+
+                    # Drop row
+                    balance += row['value']
+                    counter += 1
+                    df.drop(index, inplace=True)
+    print('[Drop Transactions] Total count: ' + str(counter) + ' with balance of ' + str(
+        round(balance)) + ' EUR.')
+
+    return df
 
 
 def _map_columns(file: pd.DataFrame, mapping: list):
@@ -148,6 +153,8 @@ def read_file_dkb(lama: Financelama, path: str):
     # that the merge operation is able to filter out duplicates correctly
     df = df.fillna(value='None')
 
+    df = _drop_irrelevant_records(df)
+
     added_records = _add_to_database(lama, df)
 
     # Print info message
@@ -188,6 +195,8 @@ def read_file_paypal(lama: Financelama, path: str):
     # Missing values are represented by '' which has to be filled by nan so
     # that the merge operation is able to filter out duplicates correctly
     df = df.fillna(value='None')
+
+    df = _drop_irrelevant_records(df)
 
     added_records = _add_to_database(lama, df)
 

@@ -19,7 +19,7 @@ lama = Financelama()
 # Read files
 # obj.read_file('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540(3).csv')
 # Lots of data here
-#read_folder_dkb(lama, 'E:/Dokumente/Finanzen/Analyse/financelama-git/data/')
+read_folder_dkb(lama, 'E:/Dokumente/Finanzen/Analyse/financelama-git/data/')
 read_file_paypal(lama, 'E:/Dokumente/Finanzen/Analyse/financelama-git/data/paypal_download.CSV')
 
 # obj.cleanup()
