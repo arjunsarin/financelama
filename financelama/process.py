@@ -5,7 +5,7 @@ categories = {
     'rent': ['miete', 'miete', 'wohnung', 'etagenbeitrag'],
     'entertainment': ['netflix', 'spotify', 'ticket', 'konzert', 'museum', 'filmstaden'],
     'restaurant': ['restaurant', 'restaurant', 'bar', 'cafe', 'qstockholm'],
-    'traffic': ['db', 'deutschebahn', 'train', 'deutsche bahn'],
+    'traffic': ['db', 'deutschebahn', 'train', 'deutsche bahn', 'sj', 'sl'],
     'income': ['gehalt', 'lohn', 'stipendium'],
     'cash': ['bankomat']
 }
