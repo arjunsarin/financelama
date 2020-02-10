@@ -1,6 +1,6 @@
-/data/
 */__pycache__/*
 */.vscode/
 financelama/test.csv
 log.txt
 /tests/lama.db
+/tests/data

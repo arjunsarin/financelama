@@ -1,12 +1,10 @@
 from financelama.core import Financelama
-import financelama.visual as visual
 
 import timeit
-import os
 
 from financelama.file_import import read_file_dkb, read_folder_dkb, read_file_paypal
 from financelama.process import categorize, modify_report
-from financelama.report import evaluate
+
 
 
 def benchmark(function):
@@ -19,10 +17,9 @@ lama = Financelama()
 # Read files
 # obj.read_file('E:/Dokumente/Finanzen/Analyse/financelama-git/data/1051054540(3).csv')
 # Lots of data here
-read_folder_dkb(lama, 'E:/Dokumente/Finanzen/Analyse/financelama-git/data/')
-read_file_paypal(lama, 'E:/Dokumente/Finanzen/Analyse/financelama-git/data/paypal_download.CSV')
+read_folder_dkb(lama, 'data/dkb/')
+# read_file_paypal(lama, 'E:/Dokumente/Finanzen/Analyse/financelama-git/data/paypal_download.CSV')
 
-# obj.cleanup()
 categorize(lama)
 
 modify_report(lama, 'urlaub', list_of_rowids={1, 2, 3})
