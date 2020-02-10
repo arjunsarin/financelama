@@ -66,7 +66,7 @@ def _map_columns(file: pd.DataFrame, mapping: list):
 
 def _add_to_database(lama: Financelama, df: pd.DataFrame):
     """
-    Adds data frame to database without creating duplicates.
+    Adds dataframe to database without creating duplicates.
 
     Parameters
     ----------
@@ -131,14 +131,14 @@ def read_file_dkb(lama: Financelama, path: str):
     if first_line.columns[0] == 'Kontonummer:':
         df = _map_columns(csv_file, mapping_dkb_giro)
 
-        # Add columm with bank account
+        # Add column with bank account
         df['account'] = first_line.columns[1].split(' / ')[0]
 
     # DKB Debit card
     elif first_line.columns[0] == 'Kreditkarte:':
         df = _map_columns(csv_file, mapping_dkb_debit)
 
-        # Add columm with bank account
+        # Add column with bank account
         df['account'] = first_line.columns[1]
 
     # Change decimal and thousand separator in value column

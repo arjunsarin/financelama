@@ -48,12 +48,12 @@ def _eval_report(df: pd.DataFrame, conn):
 
 def evaluate(lama: Financelama):
     """
-    Evaluates database in preparation of analysis.
+    Evaluates database in preparation of analysis, e.g. calls all existing evaluation function.
 
     Returns
     -------
     pandas.DataFrame
-        Evaluated data ready to be processed of analysis module (e.g. visual)
+        Evaluated data ready to be processed of visualization module (e.g. visual)
     """
     # Get total data frame
     df, conn = lama.connect_database('SELECT * FROM transactions')

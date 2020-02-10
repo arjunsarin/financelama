@@ -6,10 +6,8 @@ from financelama.file_import import read_file_dkb, read_folder_dkb, read_file_pa
 from financelama.process import categorize, modify_report
 
 
-
 def benchmark(function):
     print(timeit.timeit(function, number=1))
-
 
 # Create lama object with dataframe as data property
 lama = Financelama()
