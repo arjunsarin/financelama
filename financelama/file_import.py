@@ -118,13 +118,13 @@ def read_file_dkb(lama: Financelama, path: str):
 
     # Read bank account from first line to determine file type (giro or debit card)
     first_line = pd.read_csv(
-        path, delimiter=';', encoding='mbcs', nrows=0,
+        path, delimiter=';', encoding='ISO-8859-1', nrows=0,
     )
 
     # Read CSV file, skip Header with time and account data, MBS encoding (windows only) for
     # special characters
     csv_file = pd.read_csv(
-        path, delimiter=';', encoding='mbcs', skiprows=6,
+        path, delimiter=';', encoding='ISO-8859-1', skiprows=6,
     )
 
     # DKB Giro account
@@ -177,7 +177,7 @@ def read_file_paypal(lama: Financelama, path: str):
     # Read CSV file, skip Header with time and account data, MBS encoding (windows only) for
     # special characters
     csv_file = pd.read_csv(
-        path, delimiter=',', encoding='mbcs',
+        path, delimiter=',', encoding='ISO-8859-1',
     )
 
     df = _map_columns(csv_file, mapping_paypal)
@@ -220,8 +220,7 @@ def read_folder_dkb(lama: Financelama, path: str):
          Folder containing several compatible CSV files
     """
     # Get file list of folder
-    files = [f for f in os.listdir(path)
-             if os.path.isfile(path + f) and f.endswith('.csv')]
+    files = [f for f in os.listdir(path) if f.endswith('.csv')]
 
     for f in files:
         # try:
