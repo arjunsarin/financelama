@@ -3,11 +3,12 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+import plotly.express as px
 
 import pandas as pd
 
 
-#ROADMAP Activity heatmap (github-like) see: https://community.plot.ly/t/colored-calendar-heatmap-in-dash/10907/5
+# ROADMAP Activity heatmap (github-like) see: https://community.plot.ly/t/colored-calendar-heatmap-in-dash/10907/5
 
 def generate_table(dataframe):
     return html.Table(
@@ -40,6 +41,7 @@ def generate_monthly_expenses(dataframe):
     # Sum up values per week, returns object with DatetimeIndex
     extract = extract.groupby(pd.Grouper(key='day', freq='M')).sum()
 
+    # Create diagram and fill with data
     data = [dict(
         type='bar',
         x=extract.index,
@@ -52,6 +54,18 @@ def generate_monthly_expenses(dataframe):
     )
 
     return dcc.Graph(figure=go.Figure(data, layout))
+
+
+def generate_pie_chart_expenses(dataframe):
+    df = dataframe.loc[dataframe['value'] < 0].copy()
+    df['value'] = df['value'].abs()
+
+    return dcc.Graph(figure=px.pie(df, values='value', names='category', title='Expenses'))
+
+
+def generate_pie_chart_income(dataframe):
+    df = dataframe.loc[dataframe['value'] > 0].copy()
+    return dcc.Graph(figure=px.pie(df, values='value', names='category', title='Income'))
 
 
 def start_dashboard(dataframe: pd.DataFrame):
@@ -67,10 +81,21 @@ def start_dashboard(dataframe: pd.DataFrame):
     app = dash.Dash(__name__, external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css'])
 
     app.layout = html.Div(children=[
-        html.H1(children='Financelama'),
+        html.H1('Financelama'),
 
         # generate_table(lama.data)
-        generate_monthly_expenses(dataframe)
+        generate_monthly_expenses(dataframe),
+
+        html.Div([
+            html.Div([
+                generate_pie_chart_expenses(dataframe)
+            ], className="six columns"),
+
+            html.Div([
+                generate_pie_chart_income(dataframe)
+            ], className="six columns")
+        ], className="row")
+
     ])
 
     app.run_server(debug=True)
