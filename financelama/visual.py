@@ -11,14 +11,16 @@ import pandas as pd
 # ROADMAP Activity heatmap (github-like) see: https://community.plot.ly/t/colored-calendar-heatmap-in-dash/10907/5
 
 def generate_table(dataframe):
+    df = dataframe[['day', 'orderer', 'reason', 'value', 'category', 'report']]
+
     return html.Table(
         # Header
-        [html.Tr([html.Th(col) for col in dataframe.columns])] +
+        [html.Tr([html.Th(col) for col in df.columns])] +
 
         # Body
         [html.Tr([
-            html.Td(dataframe.iloc[i][col]) for col in dataframe.columns
-        ]) for i in range(len(dataframe))]
+            html.Td(df.iloc[i][col]) for col in df.columns
+        ]) for i in range(len(df))]
     )
 
 
@@ -94,8 +96,8 @@ def start_dashboard(dataframe: pd.DataFrame):
             html.Div([
                 generate_pie_chart_income(dataframe)
             ], className="six columns")
-        ], className="row")
-
+        ], className="row"),
+        generate_table(dataframe)
     ])
 
-    app.run_server(debug=True)
+    app.run_server(debug=False)
