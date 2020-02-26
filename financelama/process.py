@@ -1,13 +1,16 @@
 from financelama.core import Financelama
 
 categories = {
-    'supermarket': ['rewe', 'coop', 'edeka', 'lidl', 'netto', 'norma', 'frukt', 'ica'],
-    'rent': ['miete', 'miete', 'wohnung', 'etagenbeitrag'],
+    'supermarket': ['rewe', 'coop', 'edeka', 'lidl', 'netto', 'norma', 'frukt', 'ica', 'ecenter', 'aksa'],
+    'rent': ['miete', 'mieete', 'wohnung', 'etagenbeitrag'],
     'entertainment': ['netflix', 'spotify', 'ticket', 'konzert', 'museum', 'filmstaden'],
-    'restaurant': ['restaurant', 'restaurant', 'bar', 'cafe', 'qstockholm'],
-    'traffic': ['db', 'deutschebahn', 'train', 'deutsche bahn', 'sj', 'sl'],
-    'income': ['gehalt', 'lohn', 'stipendium'],
-    'cash': ['bankomat']
+    'restaurant': ['restaurant', 'restaurant', 'frittenwerk', 'bar', 'cafe', 'qstockholm', 'mcdonalds', 'backwerk', 'burger king', 'Bosch etterem', 'Bierkasse'],
+    'traffic': ['db', 'deutschebahn', 'train', 'deutsche bahn', 'sj', 'sl', 'flixbus'],
+    'drugstore': ['dm', 'rossmann'],
+    'shopping': ['amzn', 'amazon', 'ebay', 'lindt', 'eddie baur', 'bergfreunde', 'mayersche'],
+    'car': ['tankstelle', 'doetsch station',],
+    'income': ['gehalt', 'lohn', 'stipendium', 'entgelt'],
+    'cash': ['bankomat', 'sparkasse', 'sparda-bank', 'postbank']
 }
 
 
@@ -39,7 +42,7 @@ def _get_category(identifier: str) -> str:
 
 def categorize(lama: Financelama, all_entries=False):
     """
-    Add categories to rows in database
+    Add categories to rows in database according to 'orderer', 'info' and 'reason' column.
 
     Parameters
     ----------

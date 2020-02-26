@@ -19,4 +19,5 @@ mapping_paypal = [
 # column
 dropping_keywords = {
    'orderer': ['KREDITKARTENABRECHNUNG', 'Ausgleich Kreditkarte'],
+   'reason': ['umbuchung'],
 }
