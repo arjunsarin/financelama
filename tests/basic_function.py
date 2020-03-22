@@ -21,7 +21,7 @@ lama = Financelama()
 # read_folder_dkb(lama, 'data/dkb/')
 # read_file_paypal(lama, 'E:/Dokumente/Finanzen/Analyse/financelama-git/data/paypal_download.CSV')
 
-# categorize(lama)
+#categorize(lama, all_entries=True)
 
 # modify_report(lama, 'urlaub', list_of_rowids={1, 2, 3})
 # modify_report(lama, 'urlaub', list_of_ranges={(617, 620)})

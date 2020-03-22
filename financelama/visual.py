@@ -2,6 +2,7 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import plotly.express as px
 
@@ -11,7 +12,8 @@ import pandas as pd
 # ROADMAP Activity heatmap (github-like) see: https://community.plot.ly/t/colored-calendar-heatmap-in-dash/10907/5
 
 def generate_table(dataframe):
-    df = dataframe[['day', 'orderer', 'reason', 'value', 'category', 'report']]
+    df = dataframe[['orderer', 'reason', 'value', 'category', 'report']]
+    df.insert(0, 'day', dataframe['day'].dt.date)
 
     return html.Table(
         # Header
@@ -55,19 +57,19 @@ def generate_monthly_expenses(dataframe):
         title='Monthly expenses'
     )
 
-    return dcc.Graph(figure=go.Figure(data, layout))
+    return dcc.Graph(id='monthly-expenses', figure=go.Figure(data, layout))
 
 
 def generate_pie_chart_expenses(dataframe):
     df = dataframe.loc[dataframe['value'] < 0].copy()
     df['value'] = df['value'].abs()
 
-    return dcc.Graph(figure=px.pie(df, values='value', names='category', title='Expenses'))
+    return dcc.Graph(id='pie-expenses', figure=px.pie(df, values='value', names='category', title='Expenses'))
 
 
 def generate_pie_chart_income(dataframe):
     df = dataframe.loc[dataframe['value'] > 0].copy()
-    return dcc.Graph(figure=px.pie(df, values='value', names='category', title='Income'))
+    return dcc.Graph(id='pie-income', figure=px.pie(df, values='value', names='category', title='Income'))
 
 
 def start_dashboard(dataframe: pd.DataFrame):
@@ -97,7 +99,27 @@ def start_dashboard(dataframe: pd.DataFrame):
                 generate_pie_chart_income(dataframe)
             ], className="six columns")
         ], className="row"),
-        generate_table(dataframe)
+        html.Div([
+            # Monthly RAW data will be displayed here when clicked on bar chart
+        ], id='div-datatable')
+
     ])
+
+    # Callback for updating charts and table when clicking on bar
+    @app.callback(
+        Output('div-datatable', 'children'),
+        [Input('monthly-expenses', 'clickData')])
+    def update_datatable(clickData):
+        # Get end date from clicked data point and calculate start date from that
+        if clickData == None:
+            return
+
+        clicked_timestamp = pd.Timestamp(clickData['points'][0]['x'])
+        # df['month'] = df['purchase_date'].dt.floor('d') - pd.offsets.MonthBegin(1)
+        datetime_start = clicked_timestamp.floor('d') - pd.offsets.MonthBegin(1)
+        datetime_end = clicked_timestamp.floor('d')
+
+        mask = (dataframe['day'] > datetime_start) & (dataframe['day'] < datetime_end)
+        return generate_table(dataframe.loc[mask])
 
     app.run_server(debug=False)
